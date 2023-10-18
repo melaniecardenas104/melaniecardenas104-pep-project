@@ -80,18 +80,17 @@ public Message getMessageById(int message_id) {
     return null;
 }
 
-public boolean deleteMessageById(String id) {
+public void deleteMessageById(String id) {
     Connection connection = ConnectionUtil.getConnection();
     try{
         String sql = "DELETE FROM message WHERE message_id = ?;";
 
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setInt(1, Integer.parseInt(id));
-        return ps.executeUpdate() > 0;
+        
     } catch(SQLException e) {
         System.out.println(e.getMessage());
     }
-    return false;
 }
 
 public Message updateMessageByInt(int message_id, Message message) {

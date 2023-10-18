@@ -26,7 +26,7 @@ public class MessageService {
         return messageDAO.getMessageById(message_id);
     }
 //delete messages by id
-    public boolean deleteMessagesById(String messageId) {
+    public Message deleteMessageById(String messageId) {
         return messageDAO.deleteMessageById(messageId);
     }
     public Message updateMessageById(int id, Message message) {
@@ -35,8 +35,8 @@ public class MessageService {
     public List<Message> getAllMessagesById(int message_id) {
         return messageDAO.getAllMessagesById(message_id);
     }
-    public boolean deleteMessagesById(int messageId) {
-        return false;
+    public Message deleteMessageById(Message message) {
+        return message;
     }
 
 }
