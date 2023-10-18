@@ -1,5 +1,6 @@
 package Controller;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,18 +34,18 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.post("/register", this::postNewUserRegistration);
         app.post("/login", this::postLogin);
-        app.get("/messages", this:: getAllMessages);
-        app.post("/messages", this:: postNewMessage);
-        app.get("/messages/{messages_id}", this::getMessagesById);
+        app.get("/messages", this::getAllMessages);
+        app.post("/messages", this::postNewMessage);
+        app.get("/messages/{message_id}", this::getMessagesById);
         app.delete("/messages/{message_id}", this::deleteMessageById);
         app.patch("/messages{message_id}", this::updateMessageById);
-        app.get("/accounts/{account_id}/messages ", this::getAllMessagesById);
+        app.get("/accounts/{account_id}/messages", this::getAllMessagesById);
 
         return app;
     }
 
     //User registration 
-    private void postNewUserRegistration (Context ctx) throws JsonProcessingException {
+    private void postNewUserRegistration (Context ctx) throws JsonProcessingException, SQLException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
 
@@ -60,7 +61,7 @@ public class SocialMediaController {
         }
     }
     //Login info
-    private void postLogin(Context ctx) throws JsonProcessingException{
+    private void postLogin(Context ctx) throws JsonProcessingException, SQLException{
         ObjectMapper mapper = new ObjectMapper();
         //no account id
         Account account = mapper.readValue(ctx.body(), Account.class);
@@ -74,22 +75,22 @@ public class SocialMediaController {
         }
     }
     //Creating new Message
-    private void postNewMessage(Context ctx) throws JsonProcessingException {
-        Object mapper = new ObjectMapper();
-        Message message = ((ObjectMapper) mapper).readValue(ctx.body(), Message.class);
+    private void postNewMessage(Context ctx) throws JsonProcessingException, SQLException {
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(ctx.body(), Message.class);
         
         Message newMessage = messageService.createMessage(message); //this method pulls from service class and info from DAO class
         
         String messageParam = message.getMessage_text();
         Integer existingUser = message.getPosted_by();
         if(messageParam.isBlank() && messageParam.length() > 225 && existingUser.equals(existingUser)){
-            ctx.json(((ObjectMapper) mapper).writeValueAsString(newMessage));
+            ctx.json(mapper.writeValueAsString(newMessage));
             ctx.status(200);
         } else{
             ctx.status(400);
         }
     }
-    //Retriewing ALL Messages
+    //Retrieving ALL Messages
     private void getAllMessages (Context ctx){
         List<Message> messages = messageService.getAllMessages();
         ctx.json(messages);
@@ -98,9 +99,9 @@ public class SocialMediaController {
     //Get message by message_id
     private void getMessagesById(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        int messageId = Integer.parseInt(ctx.pathParam("message_id"));
+        int message_id = Integer.parseInt(ctx.pathParam("message_id"));
 
-        Message targetMessage = messageService.getMessageById(messageId);
+        Message targetMessage = messageService.getMessageById(message_id);
 
         if(targetMessage != null){
             ctx.json(mapper.writeValueAsString(targetMessage));

@@ -142,4 +142,5 @@ public class Message {
     public Object toJSON() {
         return null;
     }
+
 }

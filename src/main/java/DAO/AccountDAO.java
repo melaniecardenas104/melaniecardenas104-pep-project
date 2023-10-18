@@ -15,13 +15,13 @@ public class AccountDAO {
         Connection connection = ConnectionUtil.getConnection();
         try{
             String sql = "INSERT INTO account (username, password) VALUES (?,?);";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             
-            preparedStatement.setString(1, account.getUsername());
-            preparedStatement.setString(2, account.getPassword());
+            ps.setString(1, account.getUsername());
+            ps.setString(2, account.getPassword());
 
-            preparedStatement.executeUpdate();
-            ResultSet rs = preparedStatement.getGeneratedKeys();
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
             if(rs.next()) {
                 int generated_account_id = (int) rs.getInt("account_id");
                 return new Account(
@@ -40,12 +40,12 @@ public class AccountDAO {
         try{
             String sql = "SELECT * FROM account WHERE username = ? AND password = ?;";
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql);
             
-            preparedStatement.setString(1, account.getUsername());
-            preparedStatement.setString(2, account.getPassword());
+            ps.setString(1, account.getUsername());
+            ps.setString(2, account.getPassword());
 
-            ResultSet rs = preparedStatement.executeQuery();
+            ResultSet rs = ps.executeQuery();
             while(rs.next()) {
                 Account accounts = new Account(
                     rs.getInt("account_id"),

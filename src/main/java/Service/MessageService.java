@@ -22,8 +22,8 @@ public class MessageService {
         return messageDAO.getAllMessages();
     }
 //get messages by id
-    public Message getMessageById(int id) {
-        return messageDAO.getMessageById(id);
+    public Message getMessageById(int message_id) {
+        return messageDAO.getMessageById(message_id);
     }
 //delete messages by id
     public boolean deleteMessagesById(String messageId) {
@@ -32,8 +32,8 @@ public class MessageService {
     public Message updateMessageById(int id, Message message) {
         return messageDAO.updateMessageByInt(id, message);
     }
-    public List<Message> getAllMessagesById(int id) {
-        return messageDAO.getAllMessagesById(id);
+    public List<Message> getAllMessagesById(int message_id) {
+        return messageDAO.getAllMessagesById(message_id);
     }
     public boolean deleteMessagesById(int messageId) {
         return false;
