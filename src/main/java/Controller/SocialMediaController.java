@@ -105,9 +105,6 @@ public class SocialMediaController {
 
         if(targetMessage != null){
             ctx.json(mapper.writeValueAsString(targetMessage));
-            ctx.status(200);
-        }else{
-            ctx.status(400);
         }
     }
     //Delete a message with message_id
