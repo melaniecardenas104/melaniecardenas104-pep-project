@@ -38,7 +38,7 @@ public class SocialMediaController {
         app.post("/messages", this::postNewMessage);
         app.get("/messages/{message_id}", this::getMessagesById);
         app.delete("/messages/{message_id}", this::deleteMessageById);
-        app.patch("/messages{message_id}", this::updateMessageById);
+        app.patch("/messages/{message_id}", this::updateMessageById);
         app.get("/accounts/{account_id}/messages", this::getAllMessagesById);
 
         return app;
@@ -68,8 +68,8 @@ public class SocialMediaController {
         Account checkAccount = accountService.checkLogin(account);
 
         if(checkAccount != null){
-            ctx.json(mapper.writeValueAsString(account));
-            ctx.json(200);
+            ctx.json(mapper.writeValueAsString(checkAccount));
+            ctx.status(200);
         }else{
             ctx.status(401);
         }
@@ -78,13 +78,15 @@ public class SocialMediaController {
     private void postNewMessage(Context ctx) throws JsonProcessingException, SQLException {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
-        
-        Message newMessage = messageService.createMessage(message); //this method pulls from service class and info from DAO class
-        
         String messageParam = message.getMessage_text();
-        Integer existingUser = message.getPosted_by();
-        if(messageParam.isBlank() && messageParam.length() > 225 && existingUser.equals(existingUser)){
-            ctx.json(mapper.writeValueAsString(newMessage));
+
+        if(!messageParam.isBlank() && messageParam.length() < 255 ) {
+            message = messageService.createMessage(message); //this method pulls from service class and info from DAO class
+        }
+        Integer existingUser = message.getMessage_id();
+
+        if( existingUser != 0) {
+            ctx.json(mapper.writeValueAsString(message));
             ctx.status(200);
         } else{
             ctx.status(400);
@@ -130,22 +132,24 @@ public class SocialMediaController {
         String messageParams = message.getMessage_text();
         Integer idParams = message.getMessage_id();
 
-        if(updateMessage != null && idParams.equals(messageId) && messageParams != null && messageParams.length() < 255){
+        Message messageExists = messageService.getMessageById(messageId);
+        if(messageExists != null && updateMessage != null && messageParams != null
+                && messageParams.length() < 255 && !messageParams.isEmpty()){
             ctx.status(200);
-            ctx.json(mapper.writeValueAsString(updateMessage));
+            ctx.json(mapper.writeValueAsString(messageExists));
         } else{
             ctx.status(400);
         }
     }
     /**
      * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     * @param Javalin Context object manages information about both the HTTP request and response.
      */
     //get all messages by id
     private void getAllMessagesById(Context ctx) throws JsonProcessingException {
         int id = Integer.parseInt(ctx.pathParam("account_id"));
         List<Message> messages = messageService.getAllMessagesById(id);
         ctx.json(messages);
-        ctx.json(200);
+        ctx.status(200);
     }
 }

@@ -26,14 +26,14 @@ public class MessageDAO {
         ps.executeUpdate();
         ResultSet rs = ps.getGeneratedKeys();
 
-        if(rs.next()) {
-            int generated_message_id = (int) rs.getInt("message_id");
-            return new Message(generated_message_id, message.getPosted_by(), message.getMessage_text(), message.getTime_posted_epoch());
-        }
-    }catch(SQLException e){
+        rs.next();
+            message = new Message((int) rs.getLong("message_id"), message.getPosted_by(),
+                    message.getMessage_text(), message.getTime_posted_epoch());
+
+    }catch(Exception e){
         System.out.println(e.getMessage());
     }
-    return null;
+    return message;
 }
 
     public List<Message> getAllMessages() {
@@ -57,13 +57,13 @@ public class MessageDAO {
         return messages;
     }
 //Retrieve a message by id
-public Message getMessageById(int message_id) {
+public Message getMessageById(int id) {
     Connection connection = ConnectionUtil.getConnection();
     try{
         String sql = "SELECT * FROM message WHERE message_id = ?;";
         PreparedStatement ps = connection.prepareStatement(sql);
 
-        ps.setInt(1, message_id);
+        ps.setInt(1, id);
 
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
@@ -96,13 +96,12 @@ public void deleteMessageById(String id) {
 public Message updateMessageByInt(int message_id, Message message) {
     Connection connection = ConnectionUtil.getConnection();
     try{
-        String sql = "UPDATE message SET posted_by=?, message_text=?, time_posted_epoch=? WHERE message_id = ?;";
+        String sql = "UPDATE message SET message_text=? WHERE message_id = ?;";
         PreparedStatement ps = connection.prepareStatement(sql);
 
-        ps.setInt(1, message.getPosted_by());
-        ps.setString(2, message.getMessage_text());
-        ps.setLong(3, message.getTime_posted_epoch());
-        ps.setInt(4, message_id);
+        
+        ps.setString(1, message.getMessage_text());
+        ps.setInt(2, message_id);
         ps.executeUpdate();
     }catch (SQLException e) {
         System.out.println(e.getMessage());
